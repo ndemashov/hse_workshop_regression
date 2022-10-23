@@ -3,7 +3,9 @@ import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import train_test_split, KFold, GridSearchCV
+from sklearn.metrics import r2_score
 from src.utils import save_as_pickle
 import pandas as pd
 
@@ -21,18 +23,48 @@ def main(input_data_filepath, input_target_filepath, output_data_filepath, outpu
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
-    train_data = pd.read_pickle(input_data_filepath)
-    train_target = pd.read_pickle(input_target_filepath)
+    train = pd.read_pickle(input_data_filepath)
+    target = pd.read_pickle(input_target_filepath)
+
+
+    RANDOM_STATE = 77
+    N_SPLITS = 5
 
     train_idx, val_idx = train_test_split(
-        train_data.index, test_size=0.2, random_state=7)
+        train_data.index, 
+        test_size=0.8, 
+        random_state=RANDOM_STATE
+    )
     
-    train_data = train_data.loc[train_idx]
-    train_target = train_target.loc[train_idx]
+    train_data, val_data = train.loc[train_idx], train.loc[val_idx]
+    train_target, val_target = target.loc[train_idx], target.loc[val_idx]
 
-    # fit, save model or hyperparameters tuning using somethink like RandomizedSearchCV
+    
+    
 
-    save_as_pickle(val_idx, output_validx_filepath)
+    kf = KFold(
+        n_splits=N_SPLITS, 
+        shuffle=True, 
+        random_state=RANDOM_STATE
+    )
+
+    for train_idx, test_idx in kf.split(train):
+        X_train, X_test = train.iloc[train_idx], target.iloc[test_idx]
+        y_train, y_test = train.iloc[train_idx], target.iloc[test_idx]
+        
+        ridge = Ridge(random_state=RANDOM_STATE).fit(X_train, y_train)
+
+    model = Ridge(random_state=RANDOM_STATE, max_iter=1000)
+    clf = GridSearchCV(model, parameters, scoring='r2', cv=3)
+    clf.fit(train_data, train_target)
+    clf.best_params_
+
+
+    ridge = Ridge(random_state=RS, max_iter=1000, **clf.best_params_).fit(train_data, train_target)
+    
+
+    ridge.save_model(os.path.join(output_model_filepath, "ridge.cbm"))
+    pd.DataFrame({'indexes':val_idx.values}).to_csv(output_validx_filepath)
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
