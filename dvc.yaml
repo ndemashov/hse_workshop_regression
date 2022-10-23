@@ -14,17 +14,17 @@ stages:
     - data/processed
     - src/models/train_model.py
     outs:
-    - models/catboost:
+    - models/ridge:
         persist: true
     - data/val_index:
         persist: true
   eval:
-    cmd: python3 src/models/evaluate.py data/processed/train.pkl data/processed/target.pkl models/catboost/catboost.cbm data/val_index/validx.csv
+    cmd: python3 src/models/evaluate.py data/processed/train.pkl data/processed/target.pkl models/ridge/ridge.cbm data/val_index/validx.csv
     deps:
     - src/models/evaluate.py
     - data/interim
     - data/processed
-    - models/catboost
+    - models/ridge
     outs:
     - reports/figures:
         persist: true
