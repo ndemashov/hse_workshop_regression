@@ -52,6 +52,12 @@ def main(input_data_filepath, input_target_filepath, output_model_filepath, outp
         
         ridge = Ridge(random_state=RANDOM_STATE).fit(X_train, y_train)
 
+    parameters = {
+        'fit_intercept': [True, False],
+        'alpha': [0.1, 1, 5, 10, 15, 100],
+        'tol': [1e-5, 1e-3, 1e-1],
+        'positive': [True, False]
+    }    
     model = Ridge(random_state=RANDOM_STATE, max_iter=1000)
     clf = GridSearchCV(model, parameters, scoring='r2', cv=3)
     clf.fit(train_data, train_target)
