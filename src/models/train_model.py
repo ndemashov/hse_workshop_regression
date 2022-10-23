@@ -33,7 +33,6 @@ def main(input_data_filepath, input_target_filepath, output_model_filepath, outp
 
     cat = cb.CatBoostRegressor(cat_features= cfg.CAT_COLS)
     cat.fit(train_data.loc[train_idx], train_target.loc[train_idx])
-
     cat.save_model(os.path.join(output_model_filepath, "catboost.cbm"))
     pd.DataFrame({'indexes':val_idx.values}).to_csv(output_validx_filepath)
 

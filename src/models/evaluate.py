@@ -10,7 +10,7 @@ import click
 import pandas as pd
 import numpy as np
 
-from catboost import CatBoostClassifier
+from catboost import CatBoostRegressor
 
 from sklearn.metrics import mean_squared_error 
 
@@ -33,12 +33,13 @@ def main(input_data_filepath, input_target_filepath, input_model_filepath, input
     val_data = train_data.loc[val_indxes]
     val_target = train_target.loc[val_indxes]
 
-    trained_model = CatBoostClassifier().load_model(input_model_filepath)
+    trained_model = CatBoostRegressor().load_model(input_model_filepath)
 
     y_pred = trained_model.predict(val_data)
+    rmse = np.sqrt(mean_squared_error(np.log(val_target), np.log(y_pred)))  
 
     metrics = {
-        'rmse': np.sqrt(mean_squared_error(np.log(val_target), np.log(y_pred)))  
+        'rmse': rmse
     }
 
     with open("reports/figures/metrics.json", "w") as outfile:

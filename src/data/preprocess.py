@@ -22,10 +22,6 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna()
     return df
 
-def preprocess_target(df: pd.DataFrame) -> pd.DataFrame:
-    df[cfg.TARGET_COLS] = df[cfg.TARGET_COLS].astype(np.int8)
-    return df
-
 def extract_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     df, target = df.drop(cfg.TARGET_COLS, axis=1), df[cfg.TARGET_COLS]
     return df, target
