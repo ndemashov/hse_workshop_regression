@@ -1,0 +1,66 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python3 src/data/make_dataset.py data/raw/train.csv data/processed/train.pkl
+      data/processed/target.pkl
+    deps:
+    - path: data/raw
+      md5: f1bee252fc1163f4595334fedeb31899.dir
+      size: 962294
+      nfiles: 4
+    - path: src/data/make_dataset.py
+      md5: 492f41b3602101b85702ba244e871684
+      size: 1566
+    outs:
+    - path: data/processed
+      md5: 5060ed8df7e227a906e2bfdf83e6fece.dir
+      size: 210322
+      nfiles: 3
+  train:
+    cmd: python3 src/models/train_model.py data/processed/train.pkl data/processed/target.pkl
+      models/catboost data/val_index/validx.csv
+    deps:
+    - path: data/interim
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: data/processed
+      md5: 5060ed8df7e227a906e2bfdf83e6fece.dir
+      size: 210322
+      nfiles: 3
+    - path: src/models/train_model.py
+      md5: 0e0da74cfb5e03ff475b1a40c5fa0815
+      size: 2009
+    outs:
+    - path: data/val_index
+      md5: 0831dff4c2bce25621acfebeb36eec53.dir
+      size: 985
+      nfiles: 1
+    - path: models/catboost
+      md5: c8da5d74377785a5577a6dc7ee6699b9.dir
+      size: 1371624
+      nfiles: 1
+  eval:
+    cmd: python3 src/models/evaluate.py data/interim/train.pkl data/processed/target.pkl
+      models/logreg/logreg.cbm data/val_idx/validx.csv
+    deps:
+    - path: data/interim
+      md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
+      size: 0
+      nfiles: 1
+    - path: data/processed
+      md5: 5060ed8df7e227a906e2bfdf83e6fece.dir
+      size: 210322
+      nfiles: 3
+    - path: data/val_idx
+      md5: 08f74f277599f20fc6fe897ae74a5871
+      size: 985
+    - path: models/catboost
+      md5: 70aee2a76c13ab80078383367adb9365.dir
+      size: 1371624
+      nfiles: 1
+    outs:
+    - path: reports/figures
+      md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
+      size: 0
+      nfiles: 1

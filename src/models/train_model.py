@@ -8,15 +8,16 @@ from sklearn.model_selection import train_test_split, KFold, GridSearchCV
 from sklearn.metrics import r2_score
 from src.utils import save_as_pickle
 import pandas as pd
-
-
+import catboost as cb
+import src.config as cfg
+import os
 
 @click.command()
 @click.argument('input_data_filepath', type=click.Path(exists=True))
 @click.argument('input_target_filepath', type=click.Path(exists=True))
 @click.argument('output_model_filepath', type=click.Path())
 @click.argument('output_validx_filepath', type=click.Path())
-def main(input_data_filepath, input_target_filepath, output_data_filepath, output_validx_filepath):
+def main(input_data_filepath, input_target_filepath, output_model_filepath, output_validx_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -38,10 +39,7 @@ def main(input_data_filepath, input_target_filepath, output_data_filepath, outpu
     
     train_data, val_data = train.loc[train_idx], train.loc[val_idx]
     train_target, val_target = target.loc[train_idx], target.loc[val_idx]
-
     
-    
-
     kf = KFold(
         n_splits=N_SPLITS, 
         shuffle=True, 
@@ -64,6 +62,7 @@ def main(input_data_filepath, input_target_filepath, output_data_filepath, outpu
     
 
     ridge.save_model(os.path.join(output_model_filepath, "ridge.cbm"))
+
     pd.DataFrame({'indexes':val_idx.values}).to_csv(output_validx_filepath)
 
 if __name__ == '__main__':
