@@ -6,15 +6,16 @@ from dotenv import find_dotenv, load_dotenv
 from sklearn.model_selection import train_test_split
 from src.utils import save_as_pickle
 import pandas as pd
-
-
+import catboost as cb
+import src.config as cfg
+import os
 
 @click.command()
 @click.argument('input_data_filepath', type=click.Path(exists=True))
 @click.argument('input_target_filepath', type=click.Path(exists=True))
 @click.argument('output_model_filepath', type=click.Path())
 @click.argument('output_validx_filepath', type=click.Path())
-def main(input_data_filepath, input_target_filepath, output_data_filepath, output_validx_filepath):
+def main(input_data_filepath, input_target_filepath, output_model_filepath, output_validx_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -30,9 +31,11 @@ def main(input_data_filepath, input_target_filepath, output_data_filepath, outpu
     train_data = train_data.loc[train_idx]
     train_target = train_target.loc[train_idx]
 
-    # fit, save model or hyperparameters tuning using somethink like RandomizedSearchCV
+    cat = cb.CatBoostRegressor(cat_features= cfg.CAT_COLS)
+    cat.fit(train_data.loc[train_idx], train_target.loc[train_idx])
 
-    save_as_pickle(val_idx, output_validx_filepath)
+    cat.save_model(os.path.join(output_model_filepath, "catboost.cbm"))
+    pd.DataFrame({'indexes':val_idx.values}).to_csv(output_validx_filepath)
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

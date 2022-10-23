@@ -1,0 +1,30 @@
+stages:
+  preprocess:
+    cmd: python3 src/data/make_dataset.py data/raw/train.csv data/processed/train.pkl data/processed/target.pkl
+    deps:
+    - data/raw
+    - src/data/make_dataset.py
+    outs:
+    - data/processed:
+        persist: true
+  train:
+    cmd: python3 src/models/train_model.py data/processed/train.pkl data/processed/target.pkl models/catboost data/val_index/validx.csv
+    deps:
+    - data/interim
+    - data/processed
+    - src/models/train_model.py
+    outs:
+    - models/catboost:
+        persist: true
+    - data/val_index:
+        persist: true
+  eval:
+    cmd: python3 src/models/evaluate.py data/processed/train.pkl data/processed/target.pkl models/catboost/catboost.cbm data/val_index/validx.csv
+    deps:
+    - src/models/evaluate.py
+    - data/interim
+    - data/processed
+    - models/catboost
+    outs:
+    - reports/figures:
+        persist: true
