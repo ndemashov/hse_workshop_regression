@@ -10,7 +10,7 @@ import click
 import pandas as pd
 import numpy as np
 
-from catboost import CatBoostClassifier
+from sklearn.linear_model import Ridge
 
 from sklearn.metrics import mean_squared_error 
 
@@ -33,7 +33,7 @@ def main(input_data_filepath, input_target_filepath, input_model_filepath, input
     val_data = train_data.loc[val_indxes]
     val_target = train_target.loc[val_indxes]
 
-    trained_model = CatBoostClassifier().load_model(input_model_filepath)
+    trained_model = Ridge().load_model(input_model_filepath)
 
     y_pred = trained_model.predict(val_data)
 
