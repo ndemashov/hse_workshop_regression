@@ -18,7 +18,7 @@ stages:
       nfiles: 3
   train:
     cmd: python3 src/models/train_model.py data/processed/train.pkl data/processed/target.pkl
-      models/catboost data/val_index/validx.csv
+      models/ridge data/val_index/validx.csv
     deps:
     - path: data/interim
       md5: d751713988987e9331980363e24189ce.dir
@@ -36,7 +36,7 @@ stages:
       md5: 0831dff4c2bce25621acfebeb36eec53.dir
       size: 985
       nfiles: 1
-    - path: models/catboost
+    - path: models/ridge
       md5: c8da5d74377785a5577a6dc7ee6699b9.dir
       size: 1371624
       nfiles: 1
@@ -55,7 +55,7 @@ stages:
     - path: data/val_idx
       md5: 08f74f277599f20fc6fe897ae74a5871
       size: 985
-    - path: models/catboost
+    - path: models/ridge
       md5: 70aee2a76c13ab80078383367adb9365.dir
       size: 1371624
       nfiles: 1
